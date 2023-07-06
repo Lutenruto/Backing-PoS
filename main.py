@@ -1,56 +1,77 @@
-import sys
 import requests
+from test_port import main as find_port
 
-base_url = 'http://10.33.2.123:3210'
+base_url = 'http://{}:{}/ping'
 
-
-# Requête GET à /ping
-def ping_request():
-    ping_url = base_url + '/ping'
-    response = requests.get(ping_url)
-    print('GET /ping - Statut de la réponse:', response.status_code)
-    print('Contenu de la réponse:', response.text)
+ip_address = '10.33.2.123'
+user = "Lutenruto"
+secret = None
+port = None
 
 
-# Requête POST à /signup
+def find_ports():
+    global port
+    port = find_port()
+    if port is not None:
+        print('Port trouvé :', port)
+    else:
+        print('Aucune réponse "pong" reçue sur les ports testés.')
+
+
 def signup_request():
-    signup_url = base_url + '/signup'
-    signup_data = {'User': 'Lutenruto'}
+    signup_url = base_url.format(ip_address, port) + '/signup'
+    signup_data = {'User': user, 'Secret': secret}
     response = requests.post(signup_url, json=signup_data)
     print('POST /signup - Statut de la réponse:', response.status_code)
     print('Contenu de la réponse:', response.text)
 
 
-# Requête POST à /check
 def check_request():
-    check_url = base_url + '/check'
-    check_data = {'User': 'Lutenruto'}
+    check_url = base_url.format(ip_address, port) + '/check'
+    check_data = {'User': user, 'Secret': secret}
     response = requests.post(check_url, json=check_data)
     print('POST /check - Statut de la réponse:', response.status_code)
     print('Contenu de la réponse:', response.text)
 
 
-# Requête POST à /secret
 def secret_request():
-    secret_url = base_url + '/secret'
-    secret_data = {'User': 'Lutenruto'}
+    global secret
+    secret_url = base_url.format(ip_address, port) + '/secret'
+    secret_data = {'User': user, 'Secret': secret}
     response = requests.post(secret_url, json=secret_data)
     print('POST /secret - Statut de la réponse:', response.status_code)
     print('Contenu de la réponse:', response.text)
+    secret = response.text.split(':')[-1].strip()
 
 
-# Vérification des arguments de ligne de commande et exécution de la requête appropriée
-if len(sys.argv) < 2:
-    print("Veuillez spécifier une requête (ping, signup, check, secret).")
-else:
-    command = sys.argv[1]
-    if command == 'ping':
-        ping_request()
-    elif command == 'signup':
+def get_level():
+    level_url = base_url.format(ip_address, port) + '/getLevel'
+    level_data = {'User': user, 'Secret': secret}
+    response = requests.post(level_url, json=level_data)
+    print('POST /getLevel - Statut de la réponse:', response.status_code)
+    print('Contenu de la réponse:', response.text)
+
+
+def get_user_points():
+    points_url = base_url.format(ip_address, port) + '/getUserPoints'
+    points_data = {'User': user, 'Secret': secret}
+    response = requests.post(points_url, json=points_data)
+    print('POST /getUserPoints - Statut de la réponse:', response.status_code)
+    print('Contenu de la réponse:', response.text)
+
+
+def main():
+    global port
+    find_ports()
+    if port is not None:
         signup_request()
-    elif command == 'check':
         check_request()
-    elif command == 'secret':
         secret_request()
+        get_level()
+        get_user_points()
     else:
-        print("Requête invalide. Veuillez spécifier une requête valide (ping, signup, check, secret).")
+        print('Aucune réponse "pong" reçue sur les ports testés.')
+
+
+if __name__ == '__main__':
+    main()
