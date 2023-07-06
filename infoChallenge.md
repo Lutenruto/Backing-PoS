@@ -10,3 +10,12 @@ PATH            METHOD          BODY
 
 User : Lutenruto
 My secret : b10157a56ed0aeb2b0c84912ca11ec480050bff7c2a07f9af3a7131e822bbb29
+
+Request struct {
+    User string `json:"User"`
+}
+
+Response struct {
+    User string `json:"User"`
+    Secret string `json:"Secret"`
+}
