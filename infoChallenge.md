@@ -1,5 +1,7 @@
 GET 10.33.2.123:3210/ping
 
+${PORT} : 1024 --> 65535
+
 ## Available Routes
 
 PATH            METHOD          BODY
