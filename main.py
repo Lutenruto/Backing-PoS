@@ -1,10 +1,10 @@
 import requests
 from test_port import main as find_port
 
-base_url = 'http://{}:{}/ping'
+base_url = 'http://{}:{}'
 
 ip_address = '10.33.2.123'
-user = "Lutenruto"
+user = 'Lutenruto'
 secret = None
 port = None
 
@@ -20,7 +20,7 @@ def find_ports():
 
 def signup_request():
     signup_url = base_url.format(ip_address, port) + '/signup'
-    signup_data = {'User': user, 'Secret': secret}
+    signup_data = {'User': user}
     response = requests.post(signup_url, json=signup_data)
     print('POST /signup - Statut de la réponse:', response.status_code)
     print('Contenu de la réponse:', response.text)
@@ -28,7 +28,7 @@ def signup_request():
 
 def check_request():
     check_url = base_url.format(ip_address, port) + '/check'
-    check_data = {'User': user, 'Secret': secret}
+    check_data = {'User': user}
     response = requests.post(check_url, json=check_data)
     print('POST /check - Statut de la réponse:', response.status_code)
     print('Contenu de la réponse:', response.text)
@@ -37,7 +37,7 @@ def check_request():
 def secret_request():
     global secret
     secret_url = base_url.format(ip_address, port) + '/secret'
-    secret_data = {'User': user, 'Secret': secret}
+    secret_data = {'User': user}
     response = requests.post(secret_url, json=secret_data)
     print('POST /secret - Statut de la réponse:', response.status_code)
     print('Contenu de la réponse:', response.text)
@@ -60,6 +60,30 @@ def get_user_points():
     print('Contenu de la réponse:', response.text)
 
 
+def get_challenge():
+    challenge_url = base_url.format(ip_address, port) + '/getChallenge'
+    points_data = {'User': user, 'Secret': secret}
+    response = requests.post(challenge_url, json=points_data)
+    print('POST /getChallenge - Statut de la réponse:', response.status_code)
+    print('Contenu de la réponse:', response.text)
+
+
+def submit_challenge():
+    submit_url = base_url.format(ip_address, port) + '/submitChallenge'
+    points_data = {'User': user, 'Secret': secret, 'Content': '?'}
+    response = requests.post(submit_url, json=points_data)
+    print('POST /submitChallenge - Statut de la réponse:', response.status_code)
+    print('Contenu de la réponse:', response.text)
+
+
+def get_hint():
+    hint_url = base_url.format(ip_address, port) + '/getHint'
+    points_data = {'User': user, 'Secret': secret}
+    response = requests.post(hint_url, json=points_data)
+    print('POST /getHint - Statut de la réponse:', response.status_code)
+    print('Contenu de la réponse:', response.text)
+
+
 def main():
     global port
     find_ports()
@@ -69,6 +93,9 @@ def main():
         secret_request()
         get_level()
         get_user_points()
+        # get_challenge()
+        # get_hint()
+        # submit_challenge()
     else:
         print('Aucune réponse "pong" reçue sur les ports testés.')
 
