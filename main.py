@@ -7,6 +7,8 @@ ip_address = '10.33.2.123'
 user = 'Lutenruto'
 secret = None
 port = None
+level = None
+points = None
 
 
 def find_ports():
@@ -45,19 +47,25 @@ def secret_request():
 
 
 def get_level():
+    global level
     level_url = base_url.format(ip_address, port) + '/getLevel'
     level_data = {'User': user, 'Secret': secret}
     response = requests.post(level_url, json=level_data)
     print('POST /getLevel - Statut de la réponse:', response.status_code)
     print('Contenu de la réponse:', response.text)
+    level = (int(response.text.split(':')[-1].strip())+2)
+    print('Level :', level)
 
 
 def get_user_points():
+    global points
     points_url = base_url.format(ip_address, port) + '/getUserPoints'
     points_data = {'User': user, 'Secret': secret}
     response = requests.post(points_url, json=points_data)
     print('POST /getUserPoints - Statut de la réponse:', response.status_code)
     print('Contenu de la réponse:', response.text)
+    parts = response.text.split(':')[-1].strip()
+    points = (int(parts.split('\n')[-1].strip())-1)
 
 
 def get_challenge():
@@ -69,8 +77,22 @@ def get_challenge():
 
 
 def submit_challenge():
+    print('Level :', level)
     submit_url = base_url.format(ip_address, port) + '/submitChallenge'
-    points_data = {'User': user, 'Secret': secret, 'Content': '?'}
+    points_data = {
+        'User': user,
+        'Secret': secret,
+        'Content': {
+            'Level': level,
+            'Challenge': {
+                'Username': user,
+                'Secret': secret,
+                'Points': points,
+            },
+            'Protocol': "SHA-1",
+            'SecretKey': "Il n'y a que les imbéciles qui ne changent pas d'avis.",
+        }
+    }
     response = requests.post(submit_url, json=points_data)
     print('POST /submitChallenge - Statut de la réponse:', response.status_code)
     print('Contenu de la réponse:', response.text)
@@ -95,7 +117,7 @@ def main():
         get_user_points()
         # get_challenge()
         # get_hint()
-        # submit_challenge()
+        submit_challenge()
     else:
         print('Aucune réponse "pong" reçue sur les ports testés.')
 
